@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Juank
  */
-public class Partidos extends javax.swing.JFrame {
+public class Partidos extends javax.swing.JInternalFrame {
 
     DefaultTableModel modelo;
 

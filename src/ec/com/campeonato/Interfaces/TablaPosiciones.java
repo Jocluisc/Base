@@ -17,7 +17,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author sebastian
  */
-public class TablaPosiciones extends javax.swing.JFrame {
+public class TablaPosiciones extends javax.swing.JInternalFrame {
 
     /**
      * Creates new form TablaPosiciones
