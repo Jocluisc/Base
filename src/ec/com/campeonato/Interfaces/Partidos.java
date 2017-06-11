@@ -179,9 +179,10 @@ conexion cc = new conexion();
 
     public void llenarEstadio() {
         cmbEstadio.removeAllItems();
+         cmbEstadio.addItem("");
         cmbEstadio.addItem("CAPWEL");
         cmbEstadio.addItem("BELLAVISTA");
-
+        
     }
     public void Cancelar()
     {
