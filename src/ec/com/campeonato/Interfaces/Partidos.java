@@ -179,7 +179,7 @@ conexion cc = new conexion();
 
     public void llenarEstadio() {
         cmbEstadio.removeAllItems();
-         cmbEstadio.addItem("");
+         cmbEstadio.addItem("Seleccione uno");
         cmbEstadio.addItem("CAPWEL");
         cmbEstadio.addItem("BELLAVISTA");
         
@@ -311,6 +311,10 @@ conexion cc = new conexion();
         jLabel4.setText("Equipo Local:");
 
         jLabel5.setText("Equipo Visitante:");
+
+        cmbEquiLocal.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Seleccione uno" }));
+
+        cmbEquiVistante.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Seleccione uno" }));
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jLabel6.setText("PARTIDOS");
