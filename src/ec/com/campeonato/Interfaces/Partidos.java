@@ -209,10 +209,11 @@ public class Partidos extends javax.swing.JInternalFrame {
     }
 
     public void nuevo() {
+        txtNumeroPar.requestFocus();
         txtNumeroPar.setEnabled(true);
         cmbEquiLocal.setEnabled(true);
         cmbEquiVistante.setEnabled(true);
-        cmbEstadio.setEditable(true);
+        cmbEstadio.setEnabled(true);
         btnNuevo.setEnabled(false);
         btnGuardar.setEnabled(true);
         btnSalir.setEnabled(true);
@@ -248,6 +249,7 @@ public class Partidos extends javax.swing.JInternalFrame {
         jdtFecha = new com.toedter.calendar.JDateChooser();
         cmbEquiVistante = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -396,6 +398,13 @@ public class Partidos extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -412,6 +421,10 @@ public class Partidos extends javax.swing.JInternalFrame {
                             .addComponent(jLabel6))
                         .addGap(0, 1, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(230, 230, 230)
+                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -425,7 +438,9 @@ public class Partidos extends javax.swing.JInternalFrame {
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(268, Short.MAX_VALUE))
+                .addGap(55, 55, 55)
+                .addComponent(jButton1)
+                .addContainerGap(190, Short.MAX_VALUE))
         );
 
         pack();
@@ -439,6 +454,8 @@ public class Partidos extends javax.swing.JInternalFrame {
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
         guardarDatos();
+        botonesInicio();
+        cargarpartidos("");
 
     }//GEN-LAST:event_btnGuardarActionPerformed
 
@@ -452,6 +469,12 @@ public class Partidos extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        conexion cc= new conexion();
+        Connection cn= cc.conectar();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -496,6 +519,7 @@ public class Partidos extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox cmbEquiLocal;
     private javax.swing.JComboBox cmbEquiVistante;
     private javax.swing.JComboBox cmbEstadio;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

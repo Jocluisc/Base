@@ -106,7 +106,7 @@ public class Marcador extends javax.swing.JInternalFrame {
     }
 
     public void botonesInicio() {
-        
+
         txtGolesLocal.setEnabled(false);
         txtGolesVisit.setEnabled(false);
         cmbNumPar.setEnabled(false);
@@ -121,6 +121,17 @@ public class Marcador extends javax.swing.JInternalFrame {
         cmbNumPar.setSelectedIndex(0);
         txtGolesLocal.setText("");
         txtGolesVisit.setText("");
+    }
+
+    public void nuevo() {
+        txtGolesLocal.setEnabled(true);
+        txtGolesVisit.setEnabled(true);
+        cmbNumPar.setEnabled(true);
+        btnNuevo.setEnabled(false);
+        btnGuardar.setEnabled(true);
+        btnSalir.setEnabled(true);
+        btnCancelar.setEnabled(true);
+
     }
 
     /**
@@ -328,16 +339,20 @@ public class Marcador extends javax.swing.JInternalFrame {
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
         // TODO add your handling code here:
+        nuevo();
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
         guardarDatos();
+        botonesInicio();
         cargarpartidos("");
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         // TODO add your handling code here:
+        Cancelar();
+        botonesInicio();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
