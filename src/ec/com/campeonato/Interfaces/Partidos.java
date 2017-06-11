@@ -183,6 +183,15 @@ conexion cc = new conexion();
         cmbEstadio.addItem("BELLAVISTA");
 
     }
+    public void Cancelar()
+    {
+        txtNumeroPar.setText("");
+        txtBuscar.setText((""));
+        cmbEquiLocal.setSelectedIndex(0);
+        cmbEquiVistante.setSelectedIndex(0);
+        cmbEstadio.setSelectedIndex(0);
+    }
+       
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -422,7 +431,7 @@ conexion cc = new conexion();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
-        // TODO add your handling code here:
+       Cancelar(); // TODO add your handling code here:
 
 
     }//GEN-LAST:event_btnBorrarActionPerformed
