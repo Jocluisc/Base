@@ -35,7 +35,7 @@ public class TablaPosiciones extends javax.swing.JInternalFrame {
         mod = new DefaultTableModel(null, p);
         String[] registros = new String[9];
         String sql = "";
-        sql = "select * from POSICIONES";
+        sql = "select * from POSICIONES ORDER BY PUNTOS DESC, GD DESC";
         conexion cc = new conexion();
         Connection cn = cc.conectar();
         try {
