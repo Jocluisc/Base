@@ -41,7 +41,7 @@ public class Marcador extends javax.swing.JInternalFrame {
         conexion cc = new conexion();
         Connection cn = cc.conectar();
         String sql = "";
-        sql = "SELECT * FROM MARCADOR WHERE NUM_PAR_MAR LIKE'%" + busqueda + "%' ";
+        sql = "SELECT * FROM MARCADOR WHERE NUM_PAR_MAR LIKE'%" + busqueda + "%' order by num_par_mar asc";
         try {
             Statement psd = cn.createStatement();
             ResultSet rs = psd.executeQuery(sql);
@@ -76,8 +76,27 @@ public class Marcador extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, ex);
         }
     }
+    public void limpiar(){
+        txtGolesLocal.setText("");
+        txtGolesVisit.setText("");
+        cmbNumPar.setSelectedIndex(0);
+    }
 
     public void guardarDatos() {
+        if (txtGolesLocal.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debe Ingresar goles del equipo local");
+            txtGolesLocal.requestFocus();
+        } else {
+            if (txtGolesVisit.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Debe Ingresar goles del equipo visitante");
+                txtGolesVisit.requestFocus();
+            }else{
+                if(cmbNumPar.getSelectedIndex()==0){
+                    JOptionPane.showMessageDialog(null, "Debe seleccionar un numero de partido");
+                    
+                }
+            }
+        }
         conexion cn = new conexion();
         Connection cc = cn.conectar();
 //        fecha = aniov + "/" + mesv + "/" + fechav + " " + txtHoraLLegada.getText().trim();
@@ -112,7 +131,7 @@ public class Marcador extends javax.swing.JInternalFrame {
         cmbNumPar.setEnabled(false);
         btnNuevo.setEnabled(true);
         btnGuardar.setEnabled(false);
-        btnSalir.setEnabled(false);
+        btnSalir.setEnabled(true);
         btnCancelar.setEnabled(false);
 
     }
@@ -162,7 +181,8 @@ public class Marcador extends javax.swing.JInternalFrame {
 
         jToggleButton1.setText("jToggleButton1");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setClosable(true);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         tblMarcador.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -346,6 +366,7 @@ public class Marcador extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         guardarDatos();
         botonesInicio();
+        limpiar();
         cargarpartidos("");
     }//GEN-LAST:event_btnGuardarActionPerformed
 

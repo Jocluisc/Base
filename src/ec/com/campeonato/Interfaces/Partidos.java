@@ -32,7 +32,7 @@ public class Partidos extends javax.swing.JInternalFrame {
     public Partidos() {
         initComponents();
         cargarpartidos("");
-//        cargarEquiposC();
+//       cargarEquiposC();
         cargarEquipos();
         llenarEstadio();
         botonesInicio();
@@ -46,7 +46,7 @@ public class Partidos extends javax.swing.JInternalFrame {
         conexion cc = new conexion();
         Connection cn = cc.conectar();
         String sql = "";
-        sql = "SELECT * FROM PARTIDOS WHERE NUM_PAR LIKE'%" + busqueda + "%' ORDER BY NUM_PAR ASC";
+        sql = "SELECT * FROM PARTIDOS ORDER BY NUM_PAR ASC";
         try {
             Statement psd = cn.createStatement();
             ResultSet rs = psd.executeQuery(sql);
@@ -54,8 +54,8 @@ public class Partidos extends javax.swing.JInternalFrame {
                 datos[0] = rs.getString("NUM_PAR");
                 datos[1] = rs.getString("FEC_PAR");
                 datos[2] = rs.getString("ESTADIO");
-                datos[3] = verEquipo(rs.getString("EQ1"));
-                datos[4] = verEquipo(rs.getString("EQ2"));
+                datos[3] = (rs.getString("EQ1"));
+                datos[4] = (rs.getString("EQ2"));
                 modelo.addRow(datos);
             }
             tblPartidos.setModel(modelo);
@@ -102,42 +102,69 @@ public class Partidos extends javax.swing.JInternalFrame {
 
     }
 
-    public void guardarDatos() {
-        conexion cn = new conexion();
-        Connection cc = cn.conectar();
-        Calendar cal = Calendar.getInstance();
-//        String fecha;
-        Date fec = jdtFecha.getDate();
-        int aniov = Integer.valueOf(fec.getYear()) + 1900;
-        String mesv = String.valueOf(fec.getMonth() + 1);
-        String fechav = String.valueOf(fec.getDate());
-//        fecha = aniov + "/" + mesv + "/" + fechav + " " + txtHoraLLegada.getText().trim();
-        String FEC_PAR, ESTADIO, EQ1, EQ2;
-        int NUM_PAR;
-        String sql = "";
-        sql = "INSERT INTO PARTIDOS(NUM_PAR,FEC_PAR,ESTADIO,EQ1,EQ2) VALUES(?,?,?,?,?)";
-        NUM_PAR = Integer.valueOf(txtNumeroPar.getText());
-        FEC_PAR = fechav + "/" + mesv + "/" + aniov;
-//        FEC_PAR=txtFecha.getText().toString();
-        JOptionPane.showMessageDialog(null, FEC_PAR);
-        ESTADIO = cmbEstadio.getSelectedItem().toString();
-        EQ1 = verCodigoEquipo(cmbEquiLocal.getSelectedItem().toString());
-        EQ2 = verCodigoEquipo(cmbEquiVistante.getSelectedItem().toString());
-        try {
-            PreparedStatement psd = cc.prepareStatement(sql);
-            psd.setInt(1, NUM_PAR);
-            psd.setString(2, FEC_PAR);
-            psd.setString(3, ESTADIO);
-            psd.setString(4, EQ1);
-            psd.setString(5, EQ2);
+    public void limpiar() {
+        txtNumeroPar.setText("");
+        cmbEquiLocal.setSelectedIndex(0);
+        cmbEquiVistante.setSelectedIndex(0);
+        cmbEstadio.setSelectedIndex(0);
+    }
 
-            int n = psd.executeUpdate();
-            if (n > 0) {
-                JOptionPane.showMessageDialog(null, "Se a insertado una fila");
-                cargarpartidos("");
+    public void guardarDatos() {
+        if (txtNumeroPar.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debe Ingresar un numero de partido");
+            txtNumeroPar.requestFocus();
+        } else {
+            if (cmbEquiLocal.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debe Escojer un Equipo Local");
+                cmbEquiLocal.requestFocus();
+            } else {
+                if (cmbEquiVistante.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Debe Escojer un Equipo Visitante");
+                    cmbEquiVistante.requestFocus();
+
+                } else {
+                    if (cmbEstadio.getSelectedIndex() == 0) {
+                        JOptionPane.showMessageDialog(null, "Debe Escojer un Estadio ");
+                        cmbEstadio.requestFocus();
+
+                    }
+                    conexion cn = new conexion();
+                    Connection cc = cn.conectar();
+                    Calendar cal = Calendar.getInstance();
+
+                    Date fec = jdtFecha.getDate();
+                    int aniov = Integer.valueOf(fec.getYear()) + 1900;
+                    String mesv = String.valueOf(fec.getMonth() + 1);
+                    String fechav = String.valueOf(fec.getDate());
+                    String FEC_PAR, ESTADIO, EQ1, EQ2;
+                    int NUM_PAR;
+                    String sql = "";
+                    sql = "INSERT INTO PARTIDOS(NUM_PAR,FEC_PAR,ESTADIO,EQ1,EQ2) VALUES(?,?,?,?,?)";
+                    NUM_PAR = Integer.valueOf(txtNumeroPar.getText());
+                    FEC_PAR = fechav + "/" + mesv + "/" + aniov;
+//        JOptionPane.showMessageDialog(null, FEC_PAR);
+                    ESTADIO = cmbEstadio.getSelectedItem().toString();
+                    EQ1 = verCodigoEquipo(cmbEquiLocal.getSelectedItem().toString());
+                    EQ2 = verCodigoEquipo(cmbEquiVistante.getSelectedItem().toString());
+                    try {
+                        PreparedStatement psd = cc.prepareStatement(sql);
+                        psd.setInt(1, NUM_PAR);
+                        psd.setString(2, FEC_PAR);
+                        psd.setString(3, ESTADIO);
+                        psd.setString(4, EQ1);
+                        psd.setString(5, EQ2);
+
+                        int n = psd.executeUpdate();
+                        if (n > 0) {
+                            JOptionPane.showMessageDialog(null, "Se a insertado una fila");
+                            cargarpartidos("");
+                        }
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "El dato no se inserto");
+                    }
+                }
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "El dato no se inserto");
+
         }
 
     }
@@ -203,7 +230,7 @@ public class Partidos extends javax.swing.JInternalFrame {
         cmbEstadio.setEnabled(false);
         btnNuevo.setEnabled(true);
         btnGuardar.setEnabled(false);
-        btnSalir.setEnabled(false);
+        btnSalir.setEnabled(true);
         btnCancelar.setEnabled(false);
 
     }
@@ -249,9 +276,9 @@ public class Partidos extends javax.swing.JInternalFrame {
         jdtFecha = new com.toedter.calendar.JDateChooser();
         cmbEquiVistante = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setClosable(true);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         tblPartidos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -398,13 +425,6 @@ public class Partidos extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -421,10 +441,6 @@ public class Partidos extends javax.swing.JInternalFrame {
                             .addComponent(jLabel6))
                         .addGap(0, 1, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(230, 230, 230)
-                .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -437,10 +453,8 @@ public class Partidos extends javax.swing.JInternalFrame {
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(55, 55, 55)
-                .addComponent(jButton1)
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(151, Short.MAX_VALUE))
         );
 
         pack();
@@ -455,6 +469,7 @@ public class Partidos extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         guardarDatos();
         botonesInicio();
+        limpiar();
         cargarpartidos("");
 
     }//GEN-LAST:event_btnGuardarActionPerformed
@@ -469,12 +484,6 @@ public class Partidos extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        conexion cc= new conexion();
-        Connection cn= cc.conectar();
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -519,7 +528,6 @@ public class Partidos extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox cmbEquiLocal;
     private javax.swing.JComboBox cmbEquiVistante;
     private javax.swing.JComboBox cmbEstadio;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
