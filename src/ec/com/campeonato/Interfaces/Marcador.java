@@ -30,6 +30,7 @@ public class Marcador extends javax.swing.JFrame {
         initComponents();
         cargarNumPar();
         cargarpartidos("");
+        botonesInicio();
     }
 
     public void cargarpartidos(String busqueda) {
@@ -81,7 +82,7 @@ public class Marcador extends javax.swing.JFrame {
         Connection cc = cn.conectar();
 //        fecha = aniov + "/" + mesv + "/" + fechav + " " + txtHoraLLegada.getText().trim();
         int GEL, GEV, NUM_PAR_MAR;
-     
+
         String sql = "";
         sql = "INSERT INTO marcador(GEL, GEV, NUM_PAR_MAR) VALUES(?,?,?)";
         NUM_PAR_MAR = Integer.valueOf(cmbNumPar.getSelectedItem().toString());
@@ -104,7 +105,17 @@ public class Marcador extends javax.swing.JFrame {
 
     }
 
-   
+    public void botonesInicio() {
+        
+        txtGolesLocal.setEnabled(false);
+        txtGolesVisit.setEnabled(false);
+        cmbNumPar.setEnabled(false);
+        btnNuevo.setEnabled(true);
+        btnGuardar.setEnabled(false);
+        btnSalir.setEnabled(false);
+        btnCancelar.setEnabled(false);
+
+    }
 
     public void Cancelar() {
         cmbNumPar.setSelectedIndex(0);
