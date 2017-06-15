@@ -10,9 +10,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -21,17 +23,31 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Marcador extends javax.swing.JInternalFrame {
 
-    DefaultTableModel modelo;
-
     /**
-     * Creates new form Marcador
+     * Creates new form Marcador1
      */
     public Marcador() {
         initComponents();
         cargarNumPar();
         cargarpartidos("");
         botonesInicio();
+        tblMarcador.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int fila = tblMarcador.getSelectedRow();
+                if (tblMarcador.getSelectedRow() != -1) {
+                    cmbNumPar.setSelectedItem(tblMarcador.getValueAt(fila, 2).toString());
+                    txtGolesLocal.setText(tblMarcador.getValueAt(fila, 0).toString());
+                    txtGolesVisit.setText(tblMarcador.getValueAt(fila, 1).toString());
+                }
+
+                botonEliminar();
+                btnActualizar.setEnabled(true);
+            }
+        });
     }
+    DefaultTableModel modelo;
 
     public void cargarpartidos(String busqueda) {
         String[] titulos = {"GOLES DEL LOCAL", "GOLES DEL VISITANTE", "NUMERO DE PARTIDO"};
@@ -76,7 +92,8 @@ public class Marcador extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, ex);
         }
     }
-    public void limpiar(){
+
+    public void limpiar() {
         txtGolesLocal.setText("");
         txtGolesVisit.setText("");
         cmbNumPar.setSelectedIndex(0);
@@ -90,10 +107,10 @@ public class Marcador extends javax.swing.JInternalFrame {
             if (txtGolesVisit.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Debe Ingresar goles del equipo visitante");
                 txtGolesVisit.requestFocus();
-            }else{
-                if(cmbNumPar.getSelectedIndex()==0){
+            } else {
+                if (cmbNumPar.getSelectedIndex() == 0) {
                     JOptionPane.showMessageDialog(null, "Debe seleccionar un numero de partido");
-                    
+
                 }
             }
         }
@@ -124,6 +141,48 @@ public class Marcador extends javax.swing.JInternalFrame {
 
     }
 
+    public void modificar() {
+        botonAcrualizar();
+        if (txtGolesLocal.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Se debe ingresar Goles del Local");
+        } else {
+            if (txtGolesVisit.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Se debe ingresar Goles del Visitante");
+
+            } else {
+                conexion cc = new conexion();
+                Connection cn = cc.conectar();
+                String sql = "";
+                sql = "UPDATE MARCADOR SET GEL='" + txtGolesLocal.getText() + "',"
+                        + "GEV='" + txtGolesVisit.getText() + "'"
+                        + "WHERE NUM_PAR_MAR='" + cmbNumPar.getSelectedItem().toString() + "'";
+                try {
+                    PreparedStatement psd = cn.prepareStatement(sql);
+                    int n = psd.executeUpdate();
+                    if (n > 0) {
+                        JOptionPane.showMessageDialog(null, "Se actualiso Correctamente");
+                    }
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, ex);
+                }
+
+            }
+        }
+
+    }
+
+    public void botonEliminar() {
+        txtGolesLocal.setEnabled(true);
+        txtGolesVisit.setEnabled(true);
+        cmbNumPar.setEnabled(false);
+        btnNuevo.setEnabled(false);
+        btnGuardar.setEnabled(false);
+        btnActualizar.setEnabled(false);
+        btnBorrar.setEnabled(true);
+        btnSalir.setEnabled(true);
+        btnCancelar.setEnabled(true);
+    }
+
     public void botonesInicio() {
 
         txtGolesLocal.setEnabled(false);
@@ -131,6 +190,8 @@ public class Marcador extends javax.swing.JInternalFrame {
         cmbNumPar.setEnabled(false);
         btnNuevo.setEnabled(true);
         btnGuardar.setEnabled(false);
+        btnActualizar.setEnabled(false);
+        btnBorrar.setEnabled(false);
         btnSalir.setEnabled(true);
         btnCancelar.setEnabled(false);
 
@@ -148,10 +209,47 @@ public class Marcador extends javax.swing.JInternalFrame {
         cmbNumPar.setEnabled(true);
         btnNuevo.setEnabled(false);
         btnGuardar.setEnabled(true);
+        btnActualizar.setEnabled(false);
+        btnBorrar.setEnabled(false);
         btnSalir.setEnabled(true);
         btnCancelar.setEnabled(true);
 
     }
+
+    public void borrar() {
+        conexion cc = new conexion();
+        Connection cn = cc.conectar();
+        String sql = "";
+        sql = "DELETE  FROM MARCADOR WHERE NUM_PAR_MAR='" + cmbNumPar.getSelectedItem().toString() + "'";
+        int confirmar = JOptionPane.showConfirmDialog(null, "Esta seguro que desea Borrar el Partido");
+
+        if (JOptionPane.OK_OPTION == confirmar) {
+            try {
+                PreparedStatement psd = cn.prepareStatement(sql);
+                int n = psd.executeUpdate();
+                if (n > 0) {
+                    JOptionPane.showMessageDialog(null, " Se elimino Correctamente");
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, ex);
+            }
+            limpiar();
+            cargarpartidos("");
+            botonesInicio();
+        }
+    }
+    
+     public void botonAcrualizar(){
+        txtGolesLocal.setEnabled(true);
+        txtGolesVisit.setEnabled(true);
+        cmbNumPar.setEnabled(false);
+        btnNuevo.setEnabled(false);
+        btnGuardar.setEnabled(false);
+        btnActualizar.setEnabled(false);
+        btnBorrar.setEnabled(false);
+        btnSalir.setEnabled(true);
+        btnCancelar.setEnabled(true);
+     }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -162,7 +260,6 @@ public class Marcador extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jToggleButton1 = new javax.swing.JToggleButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblMarcador = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
@@ -170,6 +267,8 @@ public class Marcador extends javax.swing.JInternalFrame {
         btnGuardar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         btnSalir = new javax.swing.JButton();
+        btnActualizar = new javax.swing.JButton();
+        btnBorrar = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         cmbNumPar = new javax.swing.JComboBox();
@@ -179,10 +278,7 @@ public class Marcador extends javax.swing.JInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
 
-        jToggleButton1.setText("jToggleButton1");
-
-        setClosable(true);
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         tblMarcador.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -231,6 +327,22 @@ public class Marcador extends javax.swing.JInternalFrame {
             }
         });
 
+        btnActualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ec/com/viajesuta/Imagenes/actualizar.png"))); // NOI18N
+        btnActualizar.setText("Actualizar");
+        btnActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarActionPerformed(evt);
+            }
+        });
+
+        btnBorrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ec/com/viajesuta/Imagenes/eliminar.png"))); // NOI18N
+        btnBorrar.setText("Eliminar");
+        btnBorrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBorrarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -240,26 +352,37 @@ public class Marcador extends javax.swing.JInternalFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(btnNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(btnCancelar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(btnActualizar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnBorrar, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(btnCancelar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNuevo)
                     .addComponent(btnGuardar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCancelar)
-                    .addComponent(btnSalir))
-                .addContainerGap())
+                    .addComponent(btnActualizar)
+                    .addComponent(btnBorrar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSalir)
+                    .addComponent(btnCancelar))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
@@ -314,7 +437,7 @@ public class Marcador extends javax.swing.JInternalFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtGolesVisit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -328,12 +451,12 @@ public class Marcador extends javax.swing.JInternalFrame {
                         .addComponent(jLabel4))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 519, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 519, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -342,20 +465,16 @@ public class Marcador extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtGolesVisitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGolesVisitActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtGolesVisitActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
         // TODO add your handling code here:
@@ -380,6 +499,24 @@ public class Marcador extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
+        // TODO add your handling code here:
+        modificar();
+        cargarpartidos("");
+        botonesInicio();
+        
+    }//GEN-LAST:event_btnActualizarActionPerformed
+
+    private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
+        // TODO add your handling code here:
+        borrar();
+
+    }//GEN-LAST:event_btnBorrarActionPerformed
+
+    private void txtGolesVisitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGolesVisitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtGolesVisitActionPerformed
 
     /**
      * @param args the command line arguments
@@ -417,6 +554,8 @@ public class Marcador extends javax.swing.JInternalFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActualizar;
+    private javax.swing.JButton btnBorrar;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnNuevo;
@@ -429,7 +568,6 @@ public class Marcador extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTable tblMarcador;
     private javax.swing.JTextField txtGolesLocal;
     private javax.swing.JTextField txtGolesVisit;
